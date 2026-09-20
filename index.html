@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hikay's Universal Market</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1017; --bg2:#131722; --panel:#181d29; --panel2:#1e2432;
+  --line:#2a3143; --gold:#e3b559; --gold-dim:#9c7f45; --ink:#eef1f6; --ink-dim:#9aa4b8;
+  --good:#7fc088;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{
+  margin:0; background:var(--bg); overflow-x:hidden;
+  background-image: radial-gradient(ellipse at top, #171d2b 0%, var(--bg) 60%);
+  color:var(--ink); font-family:'Inter',system-ui,sans-serif; font-size:15px; line-height:1.5;
+  min-height:100%;
+}
+header{
+  position:sticky; top:0; z-index:5;
+  padding:env(safe-area-inset-top,0px) 0 0 0;
+  background:var(--bg2);
+  border-bottom:1px solid var(--line);
+  transition:box-shadow .2s ease;
+}
+header.compact{box-shadow:0 4px 14px rgba(0,0,0,.35);}
+.head-inner{
+  max-width:900px; margin:0 auto; padding:18px 20px 14px;
+  transition:padding .2s ease;
+}
+header.compact .head-inner{padding:10px 20px;}
+h1{
+  font-family:'Inter',system-ui,sans-serif; font-weight:700; font-size:19px; letter-spacing:-.2px;
+  color:var(--gold); margin:0 0 4px;
+  max-height:30px; opacity:1; overflow:hidden;
+  transition:max-height .2s ease, opacity .15s ease, margin .2s ease;
+}
+header.compact h1{max-height:0; opacity:0; margin:0;}
+.sub{
+  color:var(--ink-dim); font-size:14px; margin:0 0 14px;
+  max-height:20px; opacity:1; overflow:hidden;
+  transition:max-height .2s ease, opacity .15s ease, margin .2s ease;
+}
+header.compact .sub{max-height:0; opacity:0; margin:0;}
+#q{
+  width:100%; font-family:'Inter',system-ui,sans-serif; font-size:16px; color:var(--ink);
+  background:var(--panel); border:1px solid var(--line); border-radius:8px;
+  padding:10px 12px; outline:none; transition:border-color .15s ease;
+}
+#q:focus{border-color:var(--gold-dim);}
+#filterBtn{
+  margin-top:10px; font-family:'Inter',system-ui,sans-serif; font-size:13px; font-weight:600;
+  color:var(--ink-dim); background:var(--panel); border:1px solid var(--line); border-radius:8px;
+  padding:7px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  max-height:34px; opacity:1; overflow:hidden; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  transition:max-height .2s ease, opacity .15s ease, margin .2s ease, border-color .15s ease, color .15s ease;
+}
+#filterBtn:hover{border-color:var(--gold-dim); color:var(--ink);}
+#filterBtn.active{color:var(--gold); border-color:var(--gold-dim);}
+#filterBtn .arrow{font-size:10px; transition:transform .2s ease;}
+#filterBtn.active .arrow{transform:rotate(180deg);}
+header.compact #filterBtn{max-height:0; opacity:0; margin-top:0; padding-top:0; padding-bottom:0; border-width:0;}
+.chips{
+  display:flex; flex-wrap:wrap; gap:6px;
+  max-height:0; opacity:0; margin-top:0; overflow:hidden;
+  transition:max-height .25s ease, opacity .2s ease, margin-top .2s ease;
+}
+.chips.open{max-height:220px; opacity:1; margin-top:10px;}
+header.compact .chips{max-height:0!important; opacity:0!important; margin-top:0!important;}
+.chip{
+  font-size:13px; padding:5px 10px; border:1px solid var(--line); border-radius:20px;
+  color:var(--ink-dim); cursor:pointer; background:var(--panel); user-select:none;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.chip.on{background:var(--gold-dim); color:#0d1017; border-color:var(--gold-dim); font-weight:600;}
+main{max-width:900px; margin:0 auto; padding:16px 20px 60px;}
+.cat{
+  font-family:'Inter',system-ui,sans-serif; font-weight:600; font-size:13px; color:var(--gold);
+  text-transform:uppercase; letter-spacing:.06em;
+  margin:24px 0 8px; padding-bottom:6px; border-bottom:1px solid var(--line);
+}
+.cat:first-child{margin-top:6px;}
+.item.alt .row{background:rgba(255,255,255,.025);}
+.row{
+  display:flex; gap:10px; align-items:center; padding:9px 10px;
+  border-bottom:1px solid var(--line); border-radius:6px; max-width:100%;
+}
+.row.has-why{cursor:pointer;}
+.row.has-why:hover{background:rgba(255,255,255,.04);}
+.row .name{
+  flex:1 1 auto; color:var(--ink); min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.row .price{
+  flex:0 0 auto; color:var(--gold); font-weight:600; font-size:15px; text-align:right;
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.row .ind{
+  flex:0 0 auto; width:16px; text-align:center; color:var(--ink-dim); font-size:15px;
+  transition:transform .2s ease;
+}
+.item.open .row .ind{transform:rotate(180deg); color:var(--gold);}
+.desc{
+  max-height:0; opacity:0; overflow:hidden; padding:0 10px;
+  transition:max-height .25s ease, opacity .2s ease, padding .2s ease;
+  border-bottom:1px solid transparent;
+}
+.item.open .desc{max-height:160px; opacity:1; padding:0 10px 12px 10px; border-bottom-color:var(--line);}
+.desc .flex-badge{
+  display:inline-block; max-width:100%; box-sizing:border-box;
+  color:var(--good); font-size:12px; font-weight:600; background:rgba(127,192,136,.12);
+  border:1px solid rgba(127,192,136,.35); border-radius:6px; padding:2px 8px; margin-bottom:6px;
+  white-space:normal; overflow-wrap:break-word;
+}
+.desc p{margin:0; color:var(--ink-dim); font-size:13px; line-height:1.55; overflow-wrap:break-word;}
+.count{color:var(--ink-dim); font-size:13px; margin:10px 0 0;}
+.empty{color:var(--ink-dim); text-align:center; padding:40px 0; font-size:15px;}
+@media (max-width:560px){
+  h1{font-size:13px;}
+  .row{gap:6px;}
+  .row .price{font-size:13px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <h1>Hikay's Universal Market</h1>
+    <p class="sub">Item pricing guide — search or browse by category</p>
+    <input id="q" type="text" placeholder="Search an item, category or note..." autocomplete="off">
+    <button id="filterBtn" type="button">Filter by category <span class="arrow">▾</span></button>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+<main>
+  <p class="count" id="count"></p>
+  <div id="list"></div>
+  <p class="empty" id="empty" style="display:none;">No items match that search.</p>
+</main>
+<script>
+// [category, item, price, flexibility, why]
+const D=[
+["Ores","Coal","50","10","Easy to obtain"],
+["Ores","Copper Ore","75","",""],
+["Ores","Iron Ore","300","","Easy to obtain, but very useful"],
+["Ores","Silver Ore","100","","Useless, but rarer than copper"],
+["Ores","Gold Ore","300","",""],
+["Ores","Platinum Ore","1000","","Many uses"],
+["Ores","Azurite Ore","800","","Less uses"],
+["Ores","Purpurite Ore","1200","","Hard to obtain"],
+["Ingots","Copper Ingot","350","","Priced off crafting mats, rounded ±25g"],
+["Ingots","Iron Ingot","800","","Priced off crafting mats, rounded ±25g"],
+["Ingots","Silver Ingot","700","","Priced off crafting mats, rounded ±25g"],
+["Ingots","Gold Ingot","1900","","Priced off crafting mats, rounded ±25g"],
+["Ingots","Platinum Ingot","3350","","Priced off crafting mats, rounded ±25g"],
+["Ingots","Azurite Ingot","2100","","Priced off crafting mats, rounded ±25g"],
+["Ingots","Purpurite Ingot","6000","","Priced off crafting mats, rounded ±25g"],
+["Materials","Branch","250","",""],
+["Materials","Chain","1000","500","On demand"],
+["Materials","Nail","1000","500","On demand (same as Chain)"],
+["Materials","Resonance Powder","?","",""],
+["Materials","Silver Nugget","50","","Half a Silver Ore"],
+["Materials","Gold Nugget","150","","Half a Gold Ore"],
+["Materials","Emberfruit","1500","500","On demand"],
+["Materials","Bat Wing","500","","Common drop, serves little purpose"],
+["Materials","Emerald","750","","Little use, still a ground drop"],
+["Materials","Butterfly Wing","1000","",""],
+["Resources","Tower Revert Rune","Varies","","Take 35% of your tower's gold income, divide by runes required — usually ~200g each"],
+["Monster Drops","Brown Hide","50","","Two needed for a shirt"],
+["Monster Drops","Slime","200","",""],
+["Monster Drops","Bone","200","",""],
+["Monster Drops","Snake Skin","300","","Needed for useful gloves"],
+["Monster Drops","Fang","600","","Needed for good shoes"],
+["Monster Drops","Cyclops Hide","300","","Needed for useful gloves"],
+["Monster Drops","Eyeball","500","","Needed for telescope"],
+["Monster Drops","Forest Horror Hide","600","","Needed for very useful gloves"],
+["Monster Drops","Minotaur Hide","1500","500","On demand — needed for best gloves"],
+["Monster Drops","Tail","600","","Needed for good leg gear"],
+["Monster Drops","Half Dead Hide","1000","","Needed for very good chestplate"],
+["Monster Drops","Tooth","600","",""],
+["Monster Drops","Lava Eater Hide","1500","","Needed for best gloves"],
+["Monster Drops","Golden Bone","200","",""],
+["Monster Drops","Skull","1500","","Needed for Beast Vial"],
+["Monster Drops","Tentacle","750","","Needed for decent weapon"],
+["Monster Drops","Claw","750","","Needed for decent weapon"],
+["Monster Drops","Icicle","1500","500","On demand — needed for very good weapon"],
+["Monster Drops","Purple Sludge","2000","1000","On demand — useful drop"],
+["Monster Drops","Wyvern Sting","800","","Needed for good weapon"],
+["Flora","All Berries","1000","","Needed for super berries"],
+["Flora","All Mushrooms","1000","","Needed for super shrooms"],
+["Flora","All Flowers","750","250","On demand — needed for skill tree (we have tons of them)"],
+["Accessories","Deadly Amulet","1000","500",""],
+["Accessories","Brutal Amulet","1000","500",""],
+["Accessories","Lucky Amulet","750","",""],
+["Accessories","Other Amulets","500","",""],
+["Accessories","Copper Mining Necklace","9250","",""],
+["Accessories","Gold Mining Necklace","60750","",""],
+["Accessories","Platinum Mining Necklace","105000","",""],
+["Accessories","Shroom Seeker","23000","","Mats Needed, but it can be found while stepping"],
+["Accessories","Liora's Necklace","500000+","","Too much"],
+["Accessories","All Iron Rings","1000","",""],
+["Accessories","All Gold Rings","2000","",""],
+["Accessories","Crit Emerald Ring","25000","",""],
+["Accessories","Crit Damage Emerald Ring","25000","",""],
+["Accessories","Other Emerald Rings","3000-5000","",""],
+["Accessories","Air Platinum Ring","25000","",""],
+["Accessories","Earth Platinum Ring","25000","",""],
+["Accessories","Fire Platinum Ring","25000","",""],
+["Accessories","Water Platinum Ring","25000","",""],
+["Accessories","Crit Platinum Ring","200000","100000",""],
+["Accessories","Crit Damage Platinum Ring","200000","100000",""],
+["Accessories","Other Platinum Rings","5000","",""],
+["Chests","Shirt","100","",""],
+["Chests","Long Sleeve Shirt","150","",""],
+["Chests","Wooden Chestplate","200","",""],
+["Chests","Chainmail Shirt","300","",""],
+["Chests","Soldier Chestplate","1000","",""],
+["Chests","Purple Cloak","2000","","Ground drop"],
+["Chests","Dracula's Cloak","4000","","Enemy drop"],
+["Chests","Dark Blue Cloak","5000","","Good Em Res armor"],
+["Chests","Frostguard Chestplate","8000","","7.5k from shop"],
+["Chests","Flameguard Chestplate","8000","","7.5k from shop"],
+["Chests","Forestguard Chestplate","8000","","7.5k from shop"],
+["Chests","Windguard Chestplate","8000","","7.5k from shop"],
+["Chests","Silver Chestplate","7000","","Mats cost only — no one should build one"],
+["Chests","Gold Chestplate","17100","","Again, no real use"],
+["Chests","Volcanic Chestplate","23200","","Mats needed"],
+["Chests","Platinum Chestplate","37500","","Mats needed"],
+["Chests","Azurite Chestplate","19700","","Mats needed"],
+["Chests","Purpurite Chestplate","47000","","Mats needed"],
+["Chests","Bogsteel Chestplate","18000","","16k from shop"],
+["Helmets","Glasses","100","",""],
+["Helmets","Mining Helmet","1500","","Good helmet for mining"],
+["Helmets","Wooden Helmet","200?","","Why craft or buy it?"],
+["Helmets","Sunhat","1500","500","On demand — very useful for farming XP"],
+["Helmets","Fedora","100","",""],
+["Helmets","Sleepy Wizard Hat","300","",""],
+["Helmets","Soldier Helmet","1000","","Quite rare"],
+["Helmets","Bunny Ears","Varies a lot","","Event item"],
+["Helmets","Wizard Hat","500","",""],
+["Helmets","Santa Hat","Varies","","Event item"],
+["Helmets","Lucky Hat","1250","250","Really good hat"],
+["Helmets","Horror Mask","?","","Literally the Pirate Hat but worse"],
+["Helmets","Police Hat","1000","","58 defense!?"],
+["Helmets","Pirate Hat","1000","",""],
+["Helmets","Witches Hat","1250","","Good for farming"],
+["Helmets","Kitsune Mask","2000","","37% Crit Rate"],
+["Helmets","Mystery Mask","2000","","37% Crit Damage and high defense"],
+["Helmets","Dark Crown","5000","","Extremely high stats"],
+["Helmets","Bycocket","1250","","Meh"],
+["Helmets","Frostguard Helmet","5500","","5k from shop"],
+["Helmets","Flameguard Helmet","5500","","5k from shop"],
+["Helmets","Forestguard Helmet","5500","","5k from shop"],
+["Helmets","Windguard Helmet","5500","","5k from shop"],
+["Helmets","Iron Bucket","4800","","Mats needed, not worth it"],
+["Helmets","Silver Helmet","4200","","Mats needed, not worth it"],
+["Helmets","Gold Helmet","11400","","Mats needed, not worth it"],
+["Helmets","Volcanic Helmet","21600","","Mats needed"],
+["Helmets","Platinum Helmet","24100","","Mats needed"],
+["Helmets","Azurite Helmet","17500","","Mats needed"],
+["Helmets","Purpurite Helmet","27000","","Mats needed"],
+["Helmets","Bogsteel Helmet","10500","","10k from shop"],
+["Leggears","Frostguard Greaves","4500","","4k from shop"],
+["Leggears","Flameguard Greaves","4500","","4k from shop"],
+["Leggears","Forestguard Greaves","4500","","4k from shop"],
+["Leggears","Windguard Greaves","4500","","4k from shop"],
+["Leggears","Lifebuoy","Varies","Up to 50k","Very useful event item"],
+["Leggears","Soldier Greaves","1000","",""],
+["Leggears","Wooden Greaves","300?","","Not worth buying"],
+["Leggears","Silver Greaves","2800","","Mats needed, not worth it"],
+["Leggears","Gold Greaves","7600","","Mats needed, not worth it"],
+["Leggears","Volcanic Greaves","8500","","Mats needed, not worth it"],
+["Leggears","Platinum Greaves","18750","","Best Greaves in the game — worth it"],
+["Leggears","Azurite Greaves","7300","","Mats needed, not worth it"],
+["Leggears","Purpurite Greaves","25800","","Mats needed"],
+["Leggears","Bogsteel Greaves","10500","","10k from shop"],
+["Shoes","Sandals","100","",""],
+["Shoes","Warm Boots","250","",""],
+["Shoes","Magic Loafers","200","",""],
+["Shoes","Soldier Boots","1000","",""],
+["Shoes","Frostguard Shoes","3500","","3k from shop"],
+["Shoes","Flameguard Shoes","3500","","3k from shop"],
+["Shoes","Forestguard Shoes","3500","","3k from shop"],
+["Shoes","Windguard Shoes","3500","","3k from shop"],
+["Shoes","Wooden Shoes","100","","Not worth buying nor crafting"],
+["Shoes","Silver Batons","3500","","Mats needed, not worth it"],
+["Shoes","Gold Boots","9500","","Mats needed, not worth it"],
+["Shoes","Volcanic Boots","13900","","Equal to gold, but pricier — not worth it"],
+["Shoes","Platinum Boots","19750","","Mats needed, very good shoes"],
+["Shoes","Azurite Shoes","14100","","Mats needed, not worth it"],
+["Shoes","Purpurite Shoes","27000","","Mats needed, terrible shoes"],
+["Shoes","Bogsteel Shoes","10500","","10k from shop — good pure defense pick"],
+["Shoes","Shackle","26000","","25k from shop — best shoes for pure attack"],
+["Shields","Goblin Shield","2000","","10% drop from goblins, decent shield"],
+["Shields","Soldier Shield","?","","Same as Ancient Shield"],
+["Shields","Ancient Shield","1500","","Good shield, ground drop"],
+["Shields","Blue Shield","4000","","Drop from a farmed enemy, also good"],
+["Shields","Frostguard Shield","5500","","5.5k from shop"],
+["Shields","Flameguard Shield","5500","","5.5k from shop"],
+["Shields","Forestguard Shield","5500","","5.5k from shop"],
+["Shields","Windguard Shield","5500","","5.5k from shop"],
+["Shields","Wooden Shield","500","","Decent stat"],
+["Shields","Volcanic Shield","23900","1k-6k","Mats needed — a beast in the current meta"],
+["Shields","Pink Shield","3500","","Common drop, very good in the meta"],
+["Shields","Falcon Shield","2000","","Common ground drop, very good in the meta"],
+["Shields","Platinum Shield","43550","","Mats needed, not worth investing"],
+["Shields","Reinforced Shield","5000","","Medium-rare drop from an easy farm area, still very good"],
+["Shields","Turtle Shell","Varies","Up to 20k","Event item"],
+["Shields","Rhino Shield","5000","","Same as Reinforced Shield"],
+["Shields","Bogsteel Shield","20500","","20k from shop"],
+["Shields","Chocolate Shield","Varies","Up to 60k","Event item, one of the best"],
+["Weapons","Cool Stick","1","","Best item ever"],
+["Weapons","Wooden Sword","300","","Who would buy it?"],
+["Weapons","Learner Staff","1100","","1k from shop, don't buy it"],
+["Weapons","Simple Wand","500","","Who would buy it?"],
+["Weapons","Expert Staff","7500","","No one will buy it"],
+["Weapons","Club","350","","Waste of nails"],
+["Weapons","Copper Sword","500","",""],
+["Weapons","Nunchaku","2100","","2k from shop"],
+["Weapons","Iron Sword","1000","","Hard to say"],
+["Weapons","Iron Mace","900","",""],
+["Weapons","Soldier Sword","1500","","Actually decent sword"],
+["Weapons","Goblin Mace","1250","","Medium-rare drop"],
+["Weapons","Slime Wrath","12000","","Just... don't"],
+["Weapons","Ray's Cleaver","3100","","3k from shop, worse than Ray's Axe for the price"],
+["Weapons","Ray's Axe","3200","","3k from shop, the cooler Daniel"],
+["Weapons","Cleaver","Varies","","Event item, very bad one"],
+["Weapons","Silver Dagger","7000","","Mats needed, not worth it"],
+["Weapons","Silver Sword","8400","","Better than the dagger, still not worth it"],
+["Weapons","Scythe","3000","","Decently rare drop, very good weapon"],
+["Weapons","Gold Sword","30400","","Mats needed, skip it entirely"],
+["Weapons","Caster Staff","2000","","Medium-rare drop, not so good"],
+["Weapons","Trident","2500","","Medium-rare drop, decent weapon"],
+["Weapons","Azurite Axe","17100","","Huge Atk, not so good compared to others"],
+["Weapons","Stinglash","8000","","Mats needed, decent weapon"],
+["Weapons","Platinum Dagger","34250","","Mats needed, was a very good weapon"],
+["Weapons","Vamp Blade","37500","","Mats needed — just farm Dracula instead"],
+["Weapons","Vamp Blade 1","6000","","Medium-rare drop"],
+["Weapons","Vamp Blade 2","75000","","1% drop — rarest item in game, not that useful"],
+["Weapons","Platinum Sword","31350","","Mats needed"],
+["Weapons","Warfin","5500","","Mats needed — seems too cheap"],
+["Weapons","Abyssal Pincer","7500","","Mats needed — seems too cheap"],
+["Weapons","Three Fates","1000","","Terrible weapon"],
+["Weapons","Hungry Blade","7500","","7k from shop"],
+["Weapons","Brutal Staff","20500","","20k from shop"],
+["Weapons","Purpurite Sword","38400","Sludge varies","Mats needed"],
+["Weapons","Volcanic Sword","23000","","Mats needed"],
+["Weapons","Frostcurse","5000","","Drop — really good weapon in this meta"],
+["Weapons","Molten Axe","2000","","Drop from chest"],
+["Weapons","Ice Sword","5000","","Mats needed, similar to Frostcurse"],
+["Weapons","Molten Sword","6000","","Drop from chest"],
+["Weapons","Earth Staff","3000","","Medium-rare drop, very good weapon"],
+["Weapons","Burning Dagger","10000","","Medium-rare drop, probably best non-boss weapon"],
+["Weapons","Gilded Dominion","10000000","","Best weapon in the game"],
+["Weapons","Other Boss Weapons","5000000","1M-2.5M","Not comparable to Gilded Dominion"],
+["Fossils","Fossil","1000","1000","On demand — needed for skill tree"],
+["Fossils","Flora Fossil","3000","1000","On demand"],
+["Fossils","Fish Fossil","3000","1000","On demand"],
+["Charms","Any Charm","250 per 1x","","Average 4x = 1000g, matches ground-drop value"],
+["Foods","Any Food","250 per step","","Pickles: 4 steps = 1000g, sets the basis for all food"],
+["Tools","Basic Gloves","3000","","Mats needed, don't buy it"],
+["Tools","Snake Gloves","4500","","Mats needed, don't buy it"],
+["Tools","Red Gloves","12000","","Mats needed"],
+["Tools","Elite Gloves","13500","","Mats needed — best tool in the game"],
+["Tools","Telescope","30000","","Not worth the price, get Elite Gloves instead"],
+["Tools","Mana Skull","1600","","Mats needed"],
+["Tools","Great Mana Skull","2000","","Mats needed"],
+["Tools","Copper Pickaxe","2500","","Mats needed, ish"],
+["Tools","Iron Pickaxe","5000","",""],
+["Tools","Silver Pickaxe","3000","",""],
+["Tools","Gold Pickaxe","8000","",""],
+["Tools","Platinum Pickaxe","21000","",""],
+["Tools","Azurite Pickaxe","13500","",""],
+["Tools","Purpurite Pickaxe","37000","","Best one, go for this"],
+["Tools","Torch","500","",""],
+["Tools","Lantern","7000","","Mats needed, the better Torch"],
+["Tools","Witches Broom","Varies","Up to 50k","Event item, very good one"],
+["Tools","Shovel","Unknown","","Not in the game. Yet."],
+["Relics","Fool's Fortune","150000","","Average relic"],
+["Relics","Lamp of Seeking","50000","","Worse relic"],
+["Relics","Chalice of Abundance","300000","100000","On demand — arguably THE relic"],
+["Relics","Huntsman's Mark","50000","","Worst relic"],
+["Relics","Courier's Testament","50000","","Worse relic"],
+["Relics","Inferno's Wrath","300000","","Really good relic"],
+["Relics","Executioner's Verdict","4000000","","Extremely good relic, very expensive"],
+["Relics","Colossus Heart","500000","","Decent relic — priced for its rarity"],
+["Relics","Warden's Oath","400000","","Only for tanky builds, still very rare"],
+["Potions","Potion of Experience","8000","","Each step = 400g, scales from there"],
+["Potions","Medium Potion of Exp","14000","",""],
+["Potions","Large Potion of Exp","24000","",""]
+];
+
+const list=document.getElementById('list'), q=document.getElementById('q'),
+      countEl=document.getElementById('count'), emptyEl=document.getElementById('empty'),
+      chipsEl=document.getElementById('chips'), filterBtn=document.getElementById('filterBtn');
+
+const cats=[...new Set(D.map(r=>r[0]))];
+let activeCat=null;
+
+// Only a pure whole number gets comma-formatting and a "g" suffix.
+// Anything else ("Varies", "500000+", "250 per 1x", "1k-6k"...) is shown as written.
+const isWholeNumber = s => /^\d+$/.test(s);
+function priceDisplay(p){ return isWholeNumber(p) ? Number(p).toLocaleString('en-US')+'g' : p; }
+function flexDisplay(p){ return isWholeNumber(p) ? Number(p).toLocaleString('en-US') : p; }
+
+function render(){
+  const term=q.value.trim().toLowerCase();
+  let shown=0, lastCat=null, altToggle=false;
+  list.innerHTML='';
+  const frag=document.createDocumentFragment();
+  D.forEach(r=>{
+    const [cat,name,price,flex,why]=r;
+    if(activeCat && cat!==activeCat) return;
+    if(term){
+      const hay=(cat+' '+name+' '+why).toLowerCase();
+      if(!hay.includes(term)) return;
+    }
+    if(cat!==lastCat){
+      const h=document.createElement('div');
+      h.className='cat'; h.textContent=cat;
+      frag.appendChild(h); lastCat=cat; altToggle=false;
+    }
+    const hasExtra = !!(why || flex);
+    const item=document.createElement('div');
+    item.className='item'+(altToggle?' alt':'');
+    altToggle=!altToggle;
+
+    const row=document.createElement('div');
+    row.className='row'+(hasExtra?' has-why':'');
+    row.innerHTML=`<span class="name">${name}</span><span class="price">${priceDisplay(price)}</span>`+
+      (hasExtra?`<span class="ind">▾</span>`:'');
+    item.appendChild(row);
+
+    if(hasExtra){
+      const desc=document.createElement('div');
+      desc.className='desc';
+      desc.innerHTML=(flex?`<span class="flex-badge">±${flexDisplay(flex)} flexibility</span><br>`:'')+
+        (why?`<p>${why}</p>`:'');
+      item.appendChild(desc);
+      row.addEventListener('click', ()=> item.classList.toggle('open'));
+    }
+
+    frag.appendChild(item);
+    shown++;
+  });
+  list.appendChild(frag);
+  countEl.textContent = shown+' item'+(shown===1?'':'s');
+  emptyEl.style.display = shown? 'none':'block';
+}
+
+cats.forEach(c=>{
+  const chip=document.createElement('span');
+  chip.className='chip'; chip.textContent=c;
+  chip.addEventListener('click', ()=>{
+    activeCat = activeCat===c ? null : c;
+    [...chipsEl.children].forEach(ch=>ch.classList.toggle('on', ch.textContent===activeCat));
+    filterBtn.classList.toggle('active', !!activeCat);
+    closeChips();
+    render();
+  });
+  chipsEl.appendChild(chip);
+});
+
+function closeChips(){
+  chipsEl.classList.remove('open');
+  // Fallback: force the collapsed state directly in case a browser doesn't
+  // pick up the transition purely from the class change.
+  chipsEl.style.maxHeight='0px';
+  chipsEl.style.opacity='0';
+  chipsEl.style.marginTop='0px';
+  window.setTimeout(()=>{
+    chipsEl.style.maxHeight='';
+    chipsEl.style.opacity='';
+    chipsEl.style.marginTop='';
+  }, 260);
+}
+
+filterBtn.addEventListener('click', ()=>{
+  chipsEl.classList.toggle('open');
+});
+
+q.addEventListener('input', render);
+render();
+
+const header=document.querySelector('header');
+let ticking=false;
+function updateHeader(){
+  header.classList.toggle('compact', window.scrollY>4);
+  ticking=false;
+}
+window.addEventListener('scroll', ()=>{
+  if(!ticking){ ticking=true; requestAnimationFrame(updateHeader); }
+}, {passive:true});
+updateHeader();
+</script>
+</body>
+</html>
